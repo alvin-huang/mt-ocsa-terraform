@@ -17,3 +17,11 @@ variable "security_group_puppet" {
     "us-east-2" = "security-group-ue2-puppet"
   }
 }
+
+variable "security_group_puppet_webhook" {
+  type = "map"
+  default = {
+    "us-east-1" = "security-group-ue1-puppet-webhook"
+    "us-east-2" = "security-group-ue2-puppet-webhook"
+  }
+}
