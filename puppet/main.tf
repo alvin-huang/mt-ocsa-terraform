@@ -53,10 +53,32 @@ resource "aws_instance" "puppet_db" {
   security_groups = ["${lookup(var.security_group_ssh, var.region)}", "${lookup(var.security_group_https, var.region)}"]
 }
 
+resource "aws_instance" "jenkins_master" {
+  ami             = "${lookup(var.ami, var.region)}"
+  instance_type   = "t2.medium"
+  key_name        = "acreek"
+  security_groups = ["${lookup(var.security_group_ssh, var.region)}", "${lookup(var.security_group_https, var.region)}"]
+}
+
+resource "aws_instance" "jenkins_slave" {
+  ami             = "${lookup(var.ami, var.region)}"
+  instance_type   = "t2.small"
+  key_name        = "acreek"
+  security_groups = ["${lookup(var.security_group_ssh, var.region)}"]
+}
+
 resource "aws_eip" "puppet_master" {
   instance = "${aws_instance.puppet_master.id}"
 }
 
 resource "aws_eip" "puppet_db" {
   instance = "${aws_instance.puppet_db.id}"
+}
+
+resource "aws_eip" "jenkins_master" {
+  instance = "${aws_instance.jenkins_master.id}"
+}
+
+resource "aws_eip" "jenkins_slave" {
+  instance = "${aws_instance.jenkins_slave.id}"
 }
