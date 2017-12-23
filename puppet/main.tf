@@ -49,16 +49,6 @@ resource "aws_instance" "puppet_master" {
   }
 }
 
-resource "aws_instance" "puppet_db" {
-  ami             = "${lookup(var.ami, var.region)}"
-  instance_type   = "t2.medium"
-  key_name        = "acreek"
-  security_groups = ["${lookup(var.security_group_ssh, var.region)}", "${lookup(var.security_group_https, var.region)}"]
-  tags {
-    Name = "puppet-db"
-  }
-}
-
 resource "aws_instance" "jenkins_master" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.medium"
@@ -81,10 +71,6 @@ resource "aws_instance" "jenkins_slave" {
 
 resource "aws_eip" "puppet_master" {
   instance = "${aws_instance.puppet_master.id}"
-}
-
-resource "aws_eip" "puppet_db" {
-  instance = "${aws_instance.puppet_db.id}"
 }
 
 resource "aws_eip" "jenkins_master" {
