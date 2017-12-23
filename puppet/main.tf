@@ -27,6 +27,18 @@ resource "aws_security_group" "security_group_puppet_webhook" {
   }
 }
 
+resource "aws_security_group" "security_group_https" {
+  name        = "${lookup(var.security_group_https, var.region)}"
+  description = "Allow inbound https"
+
+  ingress {
+    from_port   = 0
+    to_port     = 443
+    protocol    = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_instance" "puppet_master" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.medium"
@@ -38,7 +50,7 @@ resource "aws_instance" "puppet_db" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.medium"
   key_name        = "acreek"
-  security_groups = ["${lookup(var.security_group_puppet, var.region)}"]
+  security_groups = ["${lookup(var.security_group_puppet, var.region)}", "${lookup(var.security_group_https, var.region)}"]
 }
 
 resource "aws_eip" "puppet_master" {
