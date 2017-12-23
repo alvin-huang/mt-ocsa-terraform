@@ -4,6 +4,17 @@ provider "aws" {
 }
 
 # security groups
+resource "aws_security_group" "security_group_outbound" {
+  name        = "${lookup(var.security_group_outbound, var.region)}"
+  description = "Allow outbound traffic"
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 resource "aws_security_group" "security_group_ssh" {
   name        = "${lookup(var.security_group_ssh, var.region)}"
   description = "Allow inbound ssh"
@@ -45,7 +56,7 @@ resource "aws_instance" "puppet_master" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.medium"
   key_name        = "acreek"
-  security_groups = ["${lookup(var.security_group_ssh, var.region)}", "${lookup(var.security_group_webhook, var.region)}"]
+  security_groups = ["${lookup(var.security_group_ssh, var.region)}", "${lookup(var.security_group_webhook, var.region)}", "${lookup(var.security_group_outbound, var.region)}"]
   tags {
     Name = "puppet-master"
   }
@@ -55,7 +66,7 @@ resource "aws_instance" "jenkins_master" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.medium"
   key_name        = "acreek"
-  security_groups = ["${lookup(var.security_group_ssh, var.region)}", "${lookup(var.security_group_https, var.region)}"]
+  security_groups = ["${lookup(var.security_group_ssh, var.region)}", "${lookup(var.security_group_https, var.region)}", "${lookup(var.security_group_outbound, var.region)}"]
   tags {
     Name = "jenkins-master"
   }
@@ -65,7 +76,7 @@ resource "aws_instance" "jenkins_slave" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.small"
   key_name        = "acreek"
-  security_groups = ["${lookup(var.security_group_ssh, var.region)}"]
+  security_groups = ["${lookup(var.security_group_ssh, var.region)}", "${lookup(var.security_group_outbound, var.region)}"]
   tags {
     Name = "jenkins-slave"
   }

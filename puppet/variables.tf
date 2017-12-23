@@ -10,6 +10,14 @@ variable "ami" {
   }
 }
 
+variable "security_group_outbound" {
+  type = "map"
+  default = {
+    "us-east-1" = "security-group-ue1-outbound"
+    "us-east-2" = "security-group-ue2-outbound"
+  }
+}
+
 variable "security_group_ssh" {
   type = "map"
   default = {
