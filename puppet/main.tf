@@ -3,11 +3,25 @@ provider "aws" {
   region  = "${var.region}"
 }
 
-resource "aws_instance" "example" {
-  ami           = "${lookup(var.ami, var.region)}"
-  instance_type = "t2.micro"
+resource "aws_security_group" "security_group_puppet" {
+  name        = "${lookup(var.security_group_puppet, var.region)}"
+  description = "Allow inbound ssh to puppet infra"
+
+  ingress {
+    from_port   = 0
+    to_port     = 22
+    protocol    = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_instance" "puppet_master" {
+  ami             = "${lookup(var.ami, var.region)}"
+  instance_type   = "t2.micro"
+  key_name        = "acreek"
+  security_groups = ["${lookup(var.security_group_puppet, var.region)}"]
 }
 
 resource "aws_eip" "ip" {
-  instance = "${aws_instance.example.id}"
+  instance = "${aws_instance.puppet_master.id}"
 }
