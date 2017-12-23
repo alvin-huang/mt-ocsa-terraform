@@ -3,6 +3,7 @@ provider "aws" {
   region  = "${var.region}"
 }
 
+# security groups
 resource "aws_security_group" "security_group_ssh" {
   name        = "${lookup(var.security_group_ssh, var.region)}"
   description = "Allow inbound ssh"
@@ -39,6 +40,7 @@ resource "aws_security_group" "security_group_https" {
   }
 }
 
+# ec2 instances
 resource "aws_instance" "puppet_master" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.medium"
@@ -69,6 +71,7 @@ resource "aws_instance" "jenkins_slave" {
   }
 }
 
+# elastic ips
 resource "aws_eip" "puppet_master" {
   instance = "${aws_instance.puppet_master.id}"
 }
