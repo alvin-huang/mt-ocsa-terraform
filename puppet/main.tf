@@ -3,9 +3,18 @@ provider "aws" {
   region  = "${var.region}"
 }
 
+# vpcs
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
+  name = "puppet"
+  cidr = "172.16.0.0/16"
+  azs             = ["${var.region}a", "${var.region}b", "${var.region}c"]
+  public_subnets  = ["172.16.1.0/24"]
+}
+
 # security groups
 resource "aws_security_group" "security_group_outbound" {
-  name        = "${lookup(var.security_group_outbound, var.region)}"
+  name        = "security-group-outbound"
   description = "Allow outbound traffic"
 
   egress {
@@ -14,9 +23,12 @@ resource "aws_security_group" "security_group_outbound" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  vpc_id = "${module.vpc.vpc_id}"
 }
+
 resource "aws_security_group" "security_group_ssh" {
-  name        = "${lookup(var.security_group_ssh, var.region)}"
+  name        = "security-group-ssh"
   description = "Allow inbound ssh"
 
   ingress {
@@ -25,10 +37,12 @@ resource "aws_security_group" "security_group_ssh" {
     protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  vpc_id = "${module.vpc.vpc_id}"
 }
 
 resource "aws_security_group" "security_group_webhook" {
-  name        = "${lookup(var.security_group_webhook, var.region)}"
+  name        = "security-group-webhook"
   description = "Allow inbound webhooks to the puppet master "
 
   ingress {
@@ -37,10 +51,12 @@ resource "aws_security_group" "security_group_webhook" {
     protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  vpc_id = "${module.vpc.vpc_id}"
 }
 
 resource "aws_security_group" "security_group_https" {
-  name        = "${lookup(var.security_group_https, var.region)}"
+  name        = "security-group-https"
   description = "Allow inbound https"
 
   ingress {
@@ -49,6 +65,8 @@ resource "aws_security_group" "security_group_https" {
     protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  vpc_id = "${module.vpc.vpc_id}"
 }
 
 # ec2 instances
@@ -56,7 +74,8 @@ resource "aws_instance" "puppet_master" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.medium"
   key_name        = "acreek"
-  security_groups = ["${lookup(var.security_group_ssh, var.region)}", "${lookup(var.security_group_webhook, var.region)}", "${lookup(var.security_group_outbound, var.region)}"]
+  subnet_id       = "${element(module.vpc.public_subnets, 0)}"
+  vpc_security_group_ids = ["${aws_security_group.security_group_ssh.id}", "${aws_security_group.security_group_webhook.id}", "${aws_security_group.security_group_outbound.id}"]
   tags {
     Name = "puppet-master"
   }
@@ -66,7 +85,8 @@ resource "aws_instance" "jenkins_master" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.medium"
   key_name        = "acreek"
-  security_groups = ["${lookup(var.security_group_ssh, var.region)}", "${lookup(var.security_group_https, var.region)}", "${lookup(var.security_group_outbound, var.region)}"]
+  subnet_id       = "${element(module.vpc.public_subnets, 0)}"
+  vpc_security_group_ids = ["${aws_security_group.security_group_ssh.id}", "${aws_security_group.security_group_https.id}", "${aws_security_group.security_group_outbound.id}"]
   tags {
     Name = "jenkins-master"
   }
@@ -76,7 +96,8 @@ resource "aws_instance" "jenkins_slave" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.small"
   key_name        = "acreek"
-  security_groups = ["${lookup(var.security_group_ssh, var.region)}", "${lookup(var.security_group_outbound, var.region)}"]
+  subnet_id       = "${element(module.vpc.public_subnets, 0)}"
+  vpc_security_group_ids = ["${aws_security_group.security_group_ssh.id}", "${aws_security_group.security_group_outbound.id}"]
   tags {
     Name = "jenkins-slave"
   }
@@ -85,12 +106,15 @@ resource "aws_instance" "jenkins_slave" {
 # elastic ips
 resource "aws_eip" "puppet_master" {
   instance = "${aws_instance.puppet_master.id}"
+  vpc = true
 }
 
 resource "aws_eip" "jenkins_master" {
   instance = "${aws_instance.jenkins_master.id}"
+  vpc = true
 }
 
 resource "aws_eip" "jenkins_slave" {
   instance = "${aws_instance.jenkins_slave.id}"
+  vpc = true
 }
