@@ -9,3 +9,11 @@ variable "ami" {
     "us-east-2" = "ami-d61133b3"
   }
 }
+
+variable "security_group_puppet" {
+  type = "map"
+  default = {
+    "us-east-1" = "security-group-ue1-puppet"
+    "us-east-2" = "security-group-ue2-puppet"
+  }
+}
