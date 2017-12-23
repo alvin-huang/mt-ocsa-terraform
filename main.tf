@@ -1,0 +1,3 @@
+module "puppet" {
+  source = "./puppet"
+}
