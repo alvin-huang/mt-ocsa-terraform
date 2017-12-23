@@ -3,9 +3,9 @@ provider "aws" {
   region  = "${var.region}"
 }
 
-resource "aws_security_group" "security_group_puppet" {
-  name        = "${lookup(var.security_group_puppet, var.region)}"
-  description = "Allow inbound ssh to puppet infra"
+resource "aws_security_group" "security_group_ssh" {
+  name        = "${lookup(var.security_group_ssh, var.region)}"
+  description = "Allow inbound ssh"
 
   ingress {
     from_port   = 0
@@ -43,14 +43,14 @@ resource "aws_instance" "puppet_master" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.medium"
   key_name        = "acreek"
-  security_groups = ["${lookup(var.security_group_puppet, var.region)}", "${lookup(var.security_group_puppet_webhook, var.region)}"]
+  security_groups = ["${lookup(var.security_group_ssh, var.region)}", "${lookup(var.security_group_puppet_webhook, var.region)}"]
 }
 
 resource "aws_instance" "puppet_db" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.medium"
   key_name        = "acreek"
-  security_groups = ["${lookup(var.security_group_puppet, var.region)}", "${lookup(var.security_group_https, var.region)}"]
+  security_groups = ["${lookup(var.security_group_ssh, var.region)}", "${lookup(var.security_group_https, var.region)}"]
 }
 
 resource "aws_eip" "puppet_master" {

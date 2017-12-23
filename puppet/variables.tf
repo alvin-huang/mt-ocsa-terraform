@@ -10,11 +10,11 @@ variable "ami" {
   }
 }
 
-variable "security_group_puppet" {
+variable "security_group_ssh" {
   type = "map"
   default = {
-    "us-east-1" = "security-group-ue1-puppet"
-    "us-east-2" = "security-group-ue2-puppet"
+    "us-east-1" = "security-group-ue1-ssh"
+    "us-east-2" = "security-group-ue2-ssh"
   }
 }
 
