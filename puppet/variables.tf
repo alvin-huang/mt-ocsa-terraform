@@ -18,11 +18,11 @@ variable "security_group_ssh" {
   }
 }
 
-variable "security_group_puppet_webhook" {
+variable "security_group_webhook" {
   type = "map"
   default = {
-    "us-east-1" = "security-group-ue1-puppet-webhook"
-    "us-east-2" = "security-group-ue2-puppet-webhook"
+    "us-east-1" = "security-group-ue1-webhook"
+    "us-east-2" = "security-group-ue2-webhook"
   }
 }
 
