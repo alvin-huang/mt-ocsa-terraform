@@ -10,6 +10,8 @@ module "vpc" {
   cidr = "172.16.0.0/16"
   azs             = ["${var.region}a", "${var.region}b", "${var.region}c"]
   public_subnets  = ["172.16.1.0/24"]
+  enable_dns_support   = true
+  enable_dns_hostnames = true
 }
 
 # security groups
