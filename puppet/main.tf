@@ -75,6 +75,21 @@ resource "aws_security_group" "https" {
   }
 }
 
+resource "aws_security_group" "puppet" {
+  name        = "puppet"
+  description = "Allow inbound puppet traffic"
+  vpc_id = "${module.vpc.vpc_id}"
+  tags {
+    Name = "puppet"
+  }
+  ingress {
+    from_port       = 8140
+    to_port         = 8140
+    protocol        = "TCP"
+    security_groups = ["${aws_security_group.ssh.id}"]
+  }
+}
+
 # ec2 instances
 resource "aws_instance" "puppet_01" {
   ami             = "${lookup(var.ami, var.region)}"
@@ -82,7 +97,7 @@ resource "aws_instance" "puppet_01" {
   key_name        = "acreek"
   monitoring      = true
   subnet_id       = "${element(module.vpc.public_subnets, 0)}"
-  vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.webhook.id}", "${aws_security_group.outbound.id}"]
+  vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.puppet.id}", "${aws_security_group.webhook.id}", "${aws_security_group.outbound.id}"]
   root_block_device {
     volume_type           = "gp2"
     volume_size           = 50
