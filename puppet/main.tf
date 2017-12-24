@@ -16,57 +16,49 @@ module "vpc" {
 resource "aws_security_group" "security_group_outbound" {
   name        = "security-group-outbound"
   description = "Allow outbound traffic"
-
+  vpc_id = "${module.vpc.vpc_id}"
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  vpc_id = "${module.vpc.vpc_id}"
 }
 
 resource "aws_security_group" "security_group_ssh" {
   name        = "security-group-ssh"
   description = "Allow inbound ssh"
-
+  vpc_id = "${module.vpc.vpc_id}"
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  vpc_id = "${module.vpc.vpc_id}"
 }
 
 resource "aws_security_group" "security_group_webhook" {
   name        = "security-group-webhook"
   description = "Allow inbound webhooks to the puppet master "
-
+  vpc_id = "${module.vpc.vpc_id}"
   ingress {
     from_port   = 8000
     to_port     = 8000
     protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  vpc_id = "${module.vpc.vpc_id}"
 }
 
 resource "aws_security_group" "security_group_https" {
   name        = "security-group-https"
   description = "Allow inbound https"
-
+  vpc_id = "${module.vpc.vpc_id}"
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  vpc_id = "${module.vpc.vpc_id}"
 }
 
 # ec2 instances
