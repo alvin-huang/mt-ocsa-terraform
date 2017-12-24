@@ -14,6 +14,18 @@ module "vpc" {
   enable_dns_hostnames = true
 }
 
+resource "aws_vpc_dhcp_options" "puppet" {
+  domain_name = "local"
+  tags {
+    Name = "puppet"
+  }
+}
+
+resource "aws_vpc_dhcp_options_association" "domain_name" {
+  vpc_id          = "${module.vpc.vpc_id}"
+  dhcp_options_id = "${aws_vpc_dhcp_options.puppet.id}"
+}
+
 # security groups
 resource "aws_security_group" "outbound" {
   name        = "outbound"
