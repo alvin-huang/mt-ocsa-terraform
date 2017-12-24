@@ -68,6 +68,11 @@ resource "aws_instance" "puppet_01" {
   key_name        = "acreek"
   subnet_id       = "${element(module.vpc.public_subnets, 0)}"
   vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.webhook.id}", "${aws_security_group.outbound.id}"]
+  root_block_device {
+    volume_type           = "gp2"
+    volume_size           = 50
+    delete_on_termination = true
+  }
   tags {
     Name = "puppet-01"
   }
@@ -88,6 +93,11 @@ resource "aws_instance" "jenkins_01" {
   key_name        = "acreek"
   subnet_id       = "${element(module.vpc.public_subnets, 0)}"
   vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.https.id}", "${aws_security_group.outbound.id}"]
+  root_block_device {
+    volume_type           = "gp2"
+    volume_size           = 50
+    delete_on_termination = true
+  }
   tags {
     Name = "jenkins-01"
   }
@@ -108,6 +118,11 @@ resource "aws_instance" "jenkins_slave_01" {
   key_name        = "acreek"
   subnet_id       = "${element(module.vpc.public_subnets, 0)}"
   vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.outbound.id}"]
+  root_block_device {
+    volume_type           = "gp2"
+    volume_size           = 50
+    delete_on_termination = true
+  }
   tags {
     Name = "jenkins-slave-01"
   }
