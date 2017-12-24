@@ -66,6 +66,7 @@ resource "aws_instance" "puppet_01" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.medium"
   key_name        = "acreek"
+  monitoring      = true
   subnet_id       = "${element(module.vpc.public_subnets, 0)}"
   vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.webhook.id}", "${aws_security_group.outbound.id}"]
   root_block_device {
@@ -91,6 +92,7 @@ resource "aws_instance" "jenkins_01" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.medium"
   key_name        = "acreek"
+  monitoring      = true
   subnet_id       = "${element(module.vpc.public_subnets, 0)}"
   vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.https.id}", "${aws_security_group.outbound.id}"]
   root_block_device {
@@ -116,6 +118,7 @@ resource "aws_instance" "jenkins_slave_01" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.small"
   key_name        = "acreek"
+  monitoring      = true
   subnet_id       = "${element(module.vpc.public_subnets, 0)}"
   vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.outbound.id}"]
   root_block_device {
