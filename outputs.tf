@@ -1,11 +1,11 @@
-output "puppet_master" {
-  value = "${module.puppet.puppet_master}"
+output "puppet_01" {
+  value = "${module.puppet.puppet_01}"
 }
 
-output "jenkins_master" {
-  value = "${module.puppet.jenkins_master}"
+output "jenkins_01" {
+  value = "${module.puppet.jenkins_01}"
 }
 
-output "jenkins_slave" {
-  value = "${module.puppet.jenkins_slave}"
+output "jenkins_slave_01" {
+  value = "${module.puppet.jenkins_slave_01}"
 }
