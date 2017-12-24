@@ -31,14 +31,14 @@ resource "aws_security_group" "outbound" {
   name        = "outbound"
   description = "Allow outbound traffic"
   vpc_id = "${module.vpc.vpc_id}"
-  tags {
-    Name = "outbound"
-  }
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags {
+    Name = "outbound"
   }
 }
 
@@ -46,14 +46,14 @@ resource "aws_security_group" "ssh" {
   name        = "ssh"
   description = "Allow inbound ssh"
   vpc_id = "${module.vpc.vpc_id}"
-  tags {
-    Name = "ssh"
-  }
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags {
+    Name = "ssh"
   }
 }
 
@@ -61,14 +61,14 @@ resource "aws_security_group" "webhook" {
   name        = "webhook"
   description = "Allow inbound webhooks to the puppet master "
   vpc_id = "${module.vpc.vpc_id}"
-  tags {
-    Name = "webhook"
-  }
   ingress {
     from_port   = 8000
     to_port     = 8000
     protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags {
+    Name = "webhook"
   }
 }
 
@@ -76,14 +76,14 @@ resource "aws_security_group" "https" {
   name        = "https"
   description = "Allow inbound https"
   vpc_id = "${module.vpc.vpc_id}"
-  tags {
-    Name = "https"
-  }
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags {
+    Name = "https"
   }
 }
 
@@ -91,14 +91,14 @@ resource "aws_security_group" "puppet" {
   name        = "puppet"
   description = "Allow inbound puppet traffic"
   vpc_id = "${module.vpc.vpc_id}"
-  tags {
-    Name = "puppet"
-  }
   ingress {
     from_port       = 8140
     to_port         = 8140
     protocol        = "TCP"
     security_groups = ["${aws_security_group.ssh.id}"]
+  }
+  tags {
+    Name = "puppet"
   }
 }
 
@@ -158,8 +158,7 @@ resource "aws_instance" "jenkins_01" {
 resource "aws_instance" "jenkins_slave_01" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.small"
-  key_name        = "acreek"
-  monitoring      = true
+  key_name        = "acreek" monitoring      = true
   subnet_id       = "${element(module.vpc.public_subnets, 0)}"
   vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.outbound.id}"]
   root_block_device {
