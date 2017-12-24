@@ -19,6 +19,9 @@ resource "aws_security_group" "outbound" {
   name        = "outbound"
   description = "Allow outbound traffic"
   vpc_id = "${module.vpc.vpc_id}"
+  tags {
+    Name = "outbound"
+  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -31,6 +34,9 @@ resource "aws_security_group" "ssh" {
   name        = "ssh"
   description = "Allow inbound ssh"
   vpc_id = "${module.vpc.vpc_id}"
+  tags {
+    Name = "ssh"
+  }
   ingress {
     from_port   = 22
     to_port     = 22
@@ -43,6 +49,9 @@ resource "aws_security_group" "webhook" {
   name        = "webhook"
   description = "Allow inbound webhooks to the puppet master "
   vpc_id = "${module.vpc.vpc_id}"
+  tags {
+    Name = "webhook"
+  }
   ingress {
     from_port   = 8000
     to_port     = 8000
@@ -55,6 +64,9 @@ resource "aws_security_group" "https" {
   name        = "https"
   description = "Allow inbound https"
   vpc_id = "${module.vpc.vpc_id}"
+  tags {
+    Name = "https"
+  }
   ingress {
     from_port   = 443
     to_port     = 443
