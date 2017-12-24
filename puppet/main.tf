@@ -62,51 +62,78 @@ resource "aws_security_group" "https" {
 }
 
 # ec2 instances
-resource "aws_instance" "puppet_master" {
+resource "aws_instance" "puppet_01" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.medium"
   key_name        = "acreek"
   subnet_id       = "${element(module.vpc.public_subnets, 0)}"
   vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.webhook.id}", "${aws_security_group.outbound.id}"]
   tags {
-    Name = "puppet-master"
+    Name = "puppet-01"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "sudo hostnamectl set-hostname --static ${aws_instance.puppet_01.tags.Name}.local"
+    ]
+    connection {
+      type = "ssh"
+      user = "centos"
+    }
   }
 }
 
-resource "aws_instance" "jenkins_master" {
+resource "aws_instance" "jenkins_01" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.medium"
   key_name        = "acreek"
   subnet_id       = "${element(module.vpc.public_subnets, 0)}"
   vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.https.id}", "${aws_security_group.outbound.id}"]
   tags {
-    Name = "jenkins-master"
+    Name = "jenkins-01"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "sudo hostnamectl set-hostname --static ${aws_instance.jenkins_01.tags.Name}.local"
+    ]
+    connection {
+      type = "ssh"
+      user = "centos"
+    }
   }
 }
 
-resource "aws_instance" "jenkins_slave" {
+resource "aws_instance" "jenkins_slave_01" {
   ami             = "${lookup(var.ami, var.region)}"
   instance_type   = "t2.small"
   key_name        = "acreek"
   subnet_id       = "${element(module.vpc.public_subnets, 0)}"
   vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.outbound.id}"]
   tags {
-    Name = "jenkins-slave"
+    Name = "jenkins-slave-01"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "sudo hostnamectl set-hostname --static ${aws_instance.jenkins_slave_01.tags.Name}.local"
+    ]
+    connection {
+      type = "ssh"
+      user = "centos"
+    }
   }
 }
 
 # elastic ips
-resource "aws_eip" "puppet_master" {
-  instance = "${aws_instance.puppet_master.id}"
+resource "aws_eip" "puppet_01" {
+  instance = "${aws_instance.puppet_01.id}"
   vpc = true
 }
 
-resource "aws_eip" "jenkins_master" {
-  instance = "${aws_instance.jenkins_master.id}"
+resource "aws_eip" "jenkins_01" {
+  instance = "${aws_instance.jenkins_01.id}"
   vpc = true
 }
 
-resource "aws_eip" "jenkins_slave" {
-  instance = "${aws_instance.jenkins_slave.id}"
+resource "aws_eip" "jenkins_slave_01" {
+  instance = "${aws_instance.jenkins_slave_01.id}"
   vpc = true
 }
