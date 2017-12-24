@@ -109,7 +109,7 @@ resource "aws_instance" "puppet_01" {
   key_name        = "acreek"
   monitoring      = true
   subnet_id       = "${element(module.vpc.public_subnets, 0)}"
-  vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.puppet.id}", "${aws_security_group.webhook.id}", "${aws_security_group.outbound.id}"]
+  vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.puppet.id}", "${aws_security_group.webhook.id}", "${aws_security_group.https.id}", "${aws_security_group.outbound.id}"]
   root_block_device {
     volume_type           = "gp2"
     volume_size           = 50
