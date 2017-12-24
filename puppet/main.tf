@@ -13,8 +13,8 @@ module "vpc" {
 }
 
 # security groups
-resource "aws_security_group" "security_group_outbound" {
-  name        = "security-group-outbound"
+resource "aws_security_group" "outbound" {
+  name        = "outbound"
   description = "Allow outbound traffic"
   vpc_id = "${module.vpc.vpc_id}"
   egress {
@@ -25,8 +25,8 @@ resource "aws_security_group" "security_group_outbound" {
   }
 }
 
-resource "aws_security_group" "security_group_ssh" {
-  name        = "security-group-ssh"
+resource "aws_security_group" "ssh" {
+  name        = "ssh"
   description = "Allow inbound ssh"
   vpc_id = "${module.vpc.vpc_id}"
   ingress {
@@ -37,8 +37,8 @@ resource "aws_security_group" "security_group_ssh" {
   }
 }
 
-resource "aws_security_group" "security_group_webhook" {
-  name        = "security-group-webhook"
+resource "aws_security_group" "webhook" {
+  name        = "webhook"
   description = "Allow inbound webhooks to the puppet master "
   vpc_id = "${module.vpc.vpc_id}"
   ingress {
@@ -49,8 +49,8 @@ resource "aws_security_group" "security_group_webhook" {
   }
 }
 
-resource "aws_security_group" "security_group_https" {
-  name        = "security-group-https"
+resource "aws_security_group" "https" {
+  name        = "https"
   description = "Allow inbound https"
   vpc_id = "${module.vpc.vpc_id}"
   ingress {
@@ -67,7 +67,7 @@ resource "aws_instance" "puppet_master" {
   instance_type   = "t2.medium"
   key_name        = "acreek"
   subnet_id       = "${element(module.vpc.public_subnets, 0)}"
-  vpc_security_group_ids = ["${aws_security_group.security_group_ssh.id}", "${aws_security_group.security_group_webhook.id}", "${aws_security_group.security_group_outbound.id}"]
+  vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.webhook.id}", "${aws_security_group.outbound.id}"]
   tags {
     Name = "puppet-master"
   }
@@ -78,7 +78,7 @@ resource "aws_instance" "jenkins_master" {
   instance_type   = "t2.medium"
   key_name        = "acreek"
   subnet_id       = "${element(module.vpc.public_subnets, 0)}"
-  vpc_security_group_ids = ["${aws_security_group.security_group_ssh.id}", "${aws_security_group.security_group_https.id}", "${aws_security_group.security_group_outbound.id}"]
+  vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.https.id}", "${aws_security_group.outbound.id}"]
   tags {
     Name = "jenkins-master"
   }
@@ -89,7 +89,7 @@ resource "aws_instance" "jenkins_slave" {
   instance_type   = "t2.small"
   key_name        = "acreek"
   subnet_id       = "${element(module.vpc.public_subnets, 0)}"
-  vpc_security_group_ids = ["${aws_security_group.security_group_ssh.id}", "${aws_security_group.security_group_outbound.id}"]
+  vpc_security_group_ids = ["${aws_security_group.ssh.id}", "${aws_security_group.outbound.id}"]
   tags {
     Name = "jenkins-slave"
   }
