@@ -1,0 +1,28 @@
+language: bash
+
+sudo: required
+
+services:
+  - docker
+
+env:
+  - tf_version=0.10.7
+  - tf_version=0.10.8
+  - tf_version=0.11.0
+  - tf_version=0.11.1
+
+before_install:
+  - docker pull hashicorp/terraform:${tf_version}
+  - docker pull wata727/tflint:0.5.3
+
+script:
+  # get any local modules
+  - modules=$(find . -type f -name "*.tf" -exec dirname {} \; | sort -u)
+  # Run 'terraform init' in workspace
+  - docker run -v $(pwd):/data --workdir=/data hashicorp/terraform:${tf_version} init -backend=false
+  # Run 'terraform validate' on all module directories
+  - for m in ${modules}; do docker run --rm -v $(pwd):/data --workdir=/data -t hashicorp/terraform:${tf_version} validate -check-variables=false &&  echo "√ $m"; done
+  # Run 'terraform fmt' to check terraform file formatting
+  - docker run -v $(pwd):/data --workdir=/data hashicorp/terraform:${tf_version} fmt -write=false -diff=true -check=true || (echo "run 'terraform fmt' to fix formatting" && exit 1)
+  # Catch any other errors that may pass 'terraform validate' with tflint
+  - for m in ${modules}; do docker run --rm -v $(pwd):/data --workdir=/data -t wata727/tflint:0.5.3 && echo "√ $m"; done

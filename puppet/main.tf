@@ -6,7 +6,7 @@ provider "aws" {
 # vpcs
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
-  name = "puppet"
+  name = "${whatevername}"
   cidr = "172.16.0.0/16"
   azs             = ["${var.region}a"]
   public_subnets  = ["172.16.1.0/24"]
