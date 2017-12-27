@@ -27,6 +27,23 @@ resource "aws_vpc_dhcp_options_association" "domain_name" {
   dhcp_options_id = "${aws_vpc_dhcp_options.puppet.id}"
 }
 
+resource "aws_route53_zone" "local" {
+  name = ".local"
+  vpc_id = "${module.vpc.vpc_id}"
+}
+
+resource "aws_route53_record" "puppet_01" {
+  zone_id = "${aws_route53_zone.local.zone_id}"
+  name    = "puppet-01"
+  type    = "A"
+  ttl     = "30"
+
+  records = [
+    "${aws_eip.puppet_01.public_ip}",
+  ]
+}
+
+
 # security groups
 resource "aws_security_group" "outbound" {
   name        = "outbound"
