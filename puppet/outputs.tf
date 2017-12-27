@@ -7,5 +7,5 @@ output "jenkins_01" {
 }
 
 output "jenkins_slave_01" {
-  value = "${aws_eip.jenkins_slave_01.public_ip}"
+  value = "${aws_instance.jenkins_slave_01.public_ip}"
 }

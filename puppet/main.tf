@@ -8,10 +8,11 @@ module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
   name = "puppet"
   cidr = "172.16.0.0/16"
-  azs             = ["${var.region}a", "${var.region}b", "${var.region}c"]
+  azs             = ["${var.region}a"]
   public_subnets  = ["172.16.1.0/24"]
   enable_dns_support   = true
   enable_dns_hostnames = true
+  enable_nat_gateway   = true
 }
 
 resource "aws_vpc_dhcp_options" "puppet" {
@@ -188,10 +189,5 @@ resource "aws_eip" "puppet_01" {
 
 resource "aws_eip" "jenkins_01" {
   instance = "${aws_instance.jenkins_01.id}"
-  vpc = true
-}
-
-resource "aws_eip" "jenkins_slave_01" {
-  instance = "${aws_instance.jenkins_slave_01.id}"
   vpc = true
 }
