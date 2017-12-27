@@ -17,6 +17,7 @@ module "vpc" {
 
 resource "aws_vpc_dhcp_options" "puppet" {
   domain_name = "local"
+  domain_name_servers = ["AmazonProvidedDNS"]
   tags {
     Name = "puppet"
   }
@@ -28,7 +29,7 @@ resource "aws_vpc_dhcp_options_association" "domain_name" {
 }
 
 resource "aws_route53_zone" "local" {
-  name = ".local"
+  name = "local"
   vpc_id = "${module.vpc.vpc_id}"
 }
 
