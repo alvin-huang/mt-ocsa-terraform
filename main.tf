@@ -59,7 +59,7 @@ resource "aws_route53_record" "puppet_01" {
   ttl     = "30"
 
   records = [
-    "${aws_eip.puppet_01.public_ip}",
+    "${aws_eip.puppet_01.private_ip}",
   ]
 }
 
